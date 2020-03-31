@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<script type="text/javascript" src="js/jquery-3.2.1.min.js" ></script>
+		<!--<link rel="stylesheet" href="ztree/css/metroStyle/metroStyle.css" />-->
+		<!--<link rel="stylesheet" href="ztree/css/awesomeStyle/awesome.css" />-->
+		<link rel="stylesheet" href="ztree/css/zTreeStyle/zTreeStyle.css" />
+		<script type="text/javascript" src="ztree/js/jquery.ztree.all.min.js" ></script>
+	</head>
+	<body>
+		<div>
+           <ul id="treeDemo" class="ztree"></ul>
+        </div>
+        <script>
+            var settingss = {
+                data: {
+                    simpleData: {
+                        enable: true,  //true 、 false 分别表示 使用 、 不使用 简单数据模式 
+                        idKey: "id",   //节点数据中保存唯一标识的属性名称
+                        pIdKey: "parentId",    //节点数据中保存其父节点唯一标识的属性名称 
+                        rootPId: -1  //用于修正根节点父节点数据，即 pIdKey 指定的属性值
+                                },
+                    key: {
+                        name: "name",  //zTree 节点数据保存节点名称的属性名称  默认值："name",可根据自己项目的属性名替换
+                        children:"child" //可根据自己项目的属性名替换
+                         }
+                       },
+                check:{
+                       enable:true,  //true 、 false 分别表示 显示 、不显示 复选框或单选框
+                       nocheckInherit:true   //当父节点设置 nocheck = true 时，设置子节点是否自动继承 nocheck = true 
+                     },
+                 callback:{
+                 beforeCheck:true,
+                onCheck:onCheck
+						}    
+                            };
+							
+            $(document).ready(function(){
+               $.ajax({
+                    type:"get",
+                    url:"http://127.0.0.1:8080/sys/permission/all",
+                    async:true,
+                    success:function(res){
+			    		console.log(res.data);
+                     zTreeObj = $.fn.zTree.init($("#treeDemo"), settingss, res.data); //初始化树
+                     zTreeObj.expandAll(true);   //true 节点全部展开、false节点收缩
+ 
+                     //设置选中节点
+                     /*var node = zTreeObj.getNodeByParam("id", 7);
+                     zTreeObj.checkNode(node, true, false); 
+                         
+                     var node = zTreeObj.getNodeByParam("id", 1);
+                     zTreeObj.checkNode(node, true, false); 
+                         
+                     var node = zTreeObj.getNodeByParam("id", 4);
+                     zTreeObj.checkNode(node, true, false); */
+                                         }
+                    });
+            });
+            
+            //获取已经选中的节点，注意格式转换
+            function onCheck(e,treeId,treeNode){
+            console.log("--------------------------------------------------------------------------"); //获取选中节点的值
+            var treeObj=$.fn.zTree.getZTreeObj("treeDemo"),
+            nodes=treeObj.getCheckedNodes(true),
+            names="",ids="";
+            
+            for(var i=0;i<nodes.length;i++){
+            names+=nodes[i].name + ",";
+            ids +=nodes[i].id + ",";
+            
+            }
+            console.log("节点id:"+ids.substr(0,ids.length-1)+"|节点名称"+names.substr(0,names.length-1)); //获取选中节点的值
+            }
+       </script>
+
+	</body>
+</html>
